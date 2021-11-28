@@ -17,12 +17,14 @@ namespace LiveSplit.Sonic2Absolute
         private MemoryWatcher<uint> ZoneIndicator { get; }
         private MemoryWatcher<byte> State { get; }
         private MemoryWatcher<byte> StartIndicator { get; }
+        private MemoryWatcher<byte> ZoneSelectOnGameComplete { get; }
 
         // Fake MemoryWatchers: used to convert game data into more easily readable formats
         public FakeMemoryWatcher<Acts> Act = new FakeMemoryWatcher<Acts>(Acts.EmeraldHillAct1, Acts.EmeraldHillAct1);
         public FakeMemoryWatcher<bool> RunStartedSaveFile = new FakeMemoryWatcher<bool>(false, false);
         public FakeMemoryWatcher<bool> RunStartedNoSaveFile = new FakeMemoryWatcher<bool>(false, false);
         public FakeMemoryWatcher<bool> StartingNewGame = new FakeMemoryWatcher<bool>(false, false);
+        public FakeMemoryWatcher<bool> RunStartedNGP = new FakeMemoryWatcher<bool>(false, false);
 
         public Watchers()
         {
@@ -57,6 +59,13 @@ namespace LiveSplit.Sonic2Absolute
             if (ptr == IntPtr.Zero) throw new Exception("Couldn't find address for the following variable: StartIndicator");
             this.StartIndicator = new MemoryWatcher<byte>(new DeepPointer((IntPtr)game.ReadValue<int>(ptr) + 0x9D8));
 
+            ptr = scanner.Scan(new SigScanTarget(2,
+                "8B 80 ????????",      // mov eax,[eax+SonicForever.exe+90FAAC]
+                "89 04 95 ????????",   // mov [edx*4+SonicForever.exe+1234F00],eax
+                "E9 570C0000"));       // jmp SonicForever.exe+2AAA6
+            if (ptr == IntPtr.Zero) throw new Exception("Couldn't find address for the following variable: ZoneSelectOnGameComplete");
+            this.ZoneSelectOnGameComplete = new MemoryWatcher<byte>(new DeepPointer((IntPtr)game.ReadValue<int>(ptr) + 0x9D8));
+
             this.AddRange(this.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(p => !p.GetIndexParameters().Any()).Select(p => p.GetValue(this, null) as MemoryWatcher).Where(p => p != null));
         }
 
@@ -72,6 +81,10 @@ namespace LiveSplit.Sonic2Absolute
             this.RunStartedNoSaveFile.Current = this.State.Current == 4 && this.StartIndicator.Changed && this.StartIndicator.Current == 1;
             this.RunStartedNoSaveFile.Changed = !this.RunStartedNoSaveFile.Old.Equals(this.RunStartedNoSaveFile.Current);
 
+            this.RunStartedNGP.Old = this.RunStartedNGP.Current;
+            this.RunStartedNGP.Current = this.State.Current == 6 && this.StartIndicator.Changed && this.StartIndicator.Current == 1 && this.ZoneSelectOnGameComplete.Current == 0;
+            this.RunStartedNGP.Changed = !this.RunStartedNGP.Old.Equals(this.RunStartedNGP.Current);
+
             this.Act.Old = this.Act.Current;
             this.Act.Current = (ZoneIndicator)this.ZoneIndicator.Current == Sonic2Absolute.ZoneIndicator.Ending ? Acts.Ending : (ZoneIndicator)ZoneIndicator.Current == Sonic2Absolute.ZoneIndicator.Zones ? (Acts)LevelID.Current : this.Act.Old;
             this.Act.Changed = !this.Act.Old.Equals(this.Act.Current);
@@ -81,7 +94,6 @@ namespace LiveSplit.Sonic2Absolute
             this.StartingNewGame.Changed = !this.StartingNewGame.Old.Equals(this.StartingNewGame.Current);
         }
     }
-
 
     class FakeMemoryWatcher<T>
     {
@@ -96,14 +108,12 @@ namespace LiveSplit.Sonic2Absolute
         }
     }
 
-
     enum ZoneIndicator : uint
     {
         MainMenu = 0x6E69614D,
         Zones = 0x656E6F5A,
         Ending = 0x69646E45
     }
-
 
     enum Acts : byte
     {

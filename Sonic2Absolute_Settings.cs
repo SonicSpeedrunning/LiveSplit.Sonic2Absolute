@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Windows.Forms;
 using System.Xml;
+using System.Windows.Forms;
 
 namespace LiveSplit.Sonic2Absolute
 {
     public partial class Settings : UserControl
     {
         public bool RunStart { get; set; }
+        public bool RunStartNGP { get; set; }
         public bool Reset { get; set; }
         public bool EH1 { get; set; }
         public bool EH2 { get; set; }
@@ -29,12 +30,18 @@ namespace LiveSplit.Sonic2Absolute
         public bool WFZ { get; set; }
         public bool DEZ { get; set; }
 
+        // Event Handlers
+        public event EventHandler OnbtnSetSplits_Click;
+        void btnSetSplits_Click(object sender, EventArgs e) { this.OnbtnSetSplits_Click?.Invoke(this, EventArgs.Empty); }
+
+
         public Settings()
         {
             InitializeComponent();
 
             // General settings
             this.chkRunStart.DataBindings.Add("Checked", this, "RunStart", false, DataSourceUpdateMode.OnPropertyChanged);
+            this.chkNGPstart.DataBindings.Add("Checked", this, "RunStartNGP", false, DataSourceUpdateMode.OnPropertyChanged);
             this.chkReset.DataBindings.Add("Checked", this, "Reset", false, DataSourceUpdateMode.OnPropertyChanged);
             this.chkEH1.DataBindings.Add("Checked", this, "EH1", false, DataSourceUpdateMode.OnPropertyChanged);
             this.chkEH2.DataBindings.Add("Checked", this, "EH2", false, DataSourceUpdateMode.OnPropertyChanged);
@@ -58,7 +65,9 @@ namespace LiveSplit.Sonic2Absolute
             this.chkDEZ.DataBindings.Add("Checked", this, "DEZ", false, DataSourceUpdateMode.OnPropertyChanged);
 
             // Default Values
-            this.RunStart = this.Reset = true;
+            this.RunStart = true;
+            this.RunStartNGP = true;
+            this.Reset = true;
             EH1 = EH2 = CP1 = CP2 = AR1 = AR2 = CN1 = CN2 = HT1 = HT2 = MC1 = MC2 = OO1 = OO2 = MZ1 = MZ2 = MZ3 = SCZ = WFZ = DEZ = true;
         }
 
@@ -66,6 +75,7 @@ namespace LiveSplit.Sonic2Absolute
         {
             XmlElement settingsNode = doc.CreateElement("settings");
             settingsNode.AppendChild(ToElement(doc, "RunStart", this.RunStart));
+            settingsNode.AppendChild(ToElement(doc, "RunStartNGP", this.RunStartNGP));
             settingsNode.AppendChild(ToElement(doc, "Reset", this.Reset));
             settingsNode.AppendChild(ToElement(doc, "EH1", this.EH1));
             settingsNode.AppendChild(ToElement(doc, "EH2", this.EH2));
@@ -93,6 +103,7 @@ namespace LiveSplit.Sonic2Absolute
         public void SetSettings(XmlNode settings)
         {
             this.RunStart = ParseBool(settings, "RunStart", true);
+            this.RunStartNGP = ParseBool(settings, "RunStartNGP", true);
             this.Reset = ParseBool(settings, "Reset", true);
             this.EH1 = ParseBool(settings, "EH1", true);
             this.EH2 = ParseBool(settings, "EH2", true);

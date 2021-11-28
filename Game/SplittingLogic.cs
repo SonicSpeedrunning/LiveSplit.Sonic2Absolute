@@ -7,7 +7,7 @@ namespace LiveSplit.Sonic2Absolute
     {
         private Watchers watchers;
 
-        public event EventHandler OnStartTrigger;
+        public event EventHandler<StartTrigger> OnStartTrigger;
         public event EventHandler<Acts> OnSplitTrigger;
         public event EventHandler OnResetTrigger;
 
@@ -22,13 +22,15 @@ namespace LiveSplit.Sonic2Absolute
 
         void Start()
         {
-            if ((watchers.RunStartedSaveFile.Current && !watchers.RunStartedSaveFile.Old) || (watchers.RunStartedNoSaveFile.Current && !watchers.RunStartedNoSaveFile.Old))
-                this.OnStartTrigger?.Invoke(this, EventArgs.Empty);
+            if (FlippedBool(watchers.RunStartedSaveFile) || FlippedBool(watchers.RunStartedNoSaveFile))
+                this.OnStartTrigger?.Invoke(this, StartTrigger.NewGame);
+            else if (FlippedBool(watchers.RunStartedNGP))
+                this.OnStartTrigger?.Invoke(this, StartTrigger.NewGamePlus);
         }
 
         void ResetLogic()
         {
-            if (watchers.StartingNewGame.Current && !watchers.StartingNewGame.Old) this.OnResetTrigger?.Invoke(this, EventArgs.Empty);
+            if (FlippedBool(watchers.StartingNewGame)) this.OnResetTrigger?.Invoke(this, EventArgs.Empty);
         }
 
         void Split()
@@ -43,5 +45,16 @@ namespace LiveSplit.Sonic2Absolute
             try { watchers = new Watchers(); } catch { Thread.Sleep(500); return false; }
             return true;
         }
+
+        private bool FlippedBool(FakeMemoryWatcher<bool> boolean)
+        {
+            return boolean.Current && !boolean.Old;
+        }
+    }
+
+    enum StartTrigger
+    {
+        NewGame,
+        NewGamePlus
     }
 }

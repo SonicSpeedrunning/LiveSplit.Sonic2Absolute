@@ -30,6 +30,7 @@
         {
             this.components = new System.ComponentModel.Container();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.chkReset = new System.Windows.Forms.CheckBox();
             this.chkRunStart = new System.Windows.Forms.CheckBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.chkDEZ = new System.Windows.Forms.CheckBox();
@@ -53,13 +54,15 @@
             this.chkEH2 = new System.Windows.Forms.CheckBox();
             this.chkEH1 = new System.Windows.Forms.CheckBox();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
-            this.chkReset = new System.Windows.Forms.CheckBox();
+            this.chkNGPstart = new System.Windows.Forms.CheckBox();
+            this.btnSetSplits = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.chkNGPstart);
             this.groupBox1.Controls.Add(this.chkReset);
             this.groupBox1.Controls.Add(this.chkRunStart);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -72,6 +75,18 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "General Options";
             // 
+            // chkReset
+            // 
+            this.chkReset.AutoSize = true;
+            this.chkReset.Checked = true;
+            this.chkReset.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkReset.Location = new System.Drawing.Point(297, 23);
+            this.chkReset.Name = "chkReset";
+            this.chkReset.Size = new System.Drawing.Size(79, 17);
+            this.chkReset.TabIndex = 2;
+            this.chkReset.Text = "Auto Reset";
+            this.chkReset.UseVisualStyleBackColor = true;
+            // 
             // chkRunStart
             // 
             this.chkRunStart.AutoSize = true;
@@ -80,14 +95,15 @@
             this.chkRunStart.Dock = System.Windows.Forms.DockStyle.Left;
             this.chkRunStart.Location = new System.Drawing.Point(10, 23);
             this.chkRunStart.Name = "chkRunStart";
-            this.chkRunStart.Size = new System.Drawing.Size(73, 17);
+            this.chkRunStart.Size = new System.Drawing.Size(134, 17);
             this.chkRunStart.TabIndex = 0;
-            this.chkRunStart.Text = "Auto Start";
+            this.chkRunStart.Text = "Auto Start (clean save)";
+            this.toolTip1.SetToolTip(this.chkRunStart, "Will automatically LiveSplit\'s timer upon\r\nselection of an empy savefile or when " +
+        "starting\r\nwith the \"no save\" option.");
             this.chkRunStart.UseVisualStyleBackColor = true;
             // 
             // groupBox2
             // 
-            this.groupBox2.AutoSize = true;
             this.groupBox2.Controls.Add(this.chkDEZ);
             this.groupBox2.Controls.Add(this.chkWFZ);
             this.groupBox2.Controls.Add(this.chkSCZ);
@@ -337,24 +353,37 @@
             this.chkEH1.Text = "Emerald Hill Zone - Act 1";
             this.chkEH1.UseVisualStyleBackColor = true;
             // 
-            // chkReset
+            // chkNGPstart
             // 
-            this.chkReset.AutoSize = true;
-            this.chkReset.Checked = true;
-            this.chkReset.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.chkReset.Dock = System.Windows.Forms.DockStyle.Left;
-            this.chkReset.Location = new System.Drawing.Point(83, 23);
-            this.chkReset.Name = "chkReset";
-            this.chkReset.Size = new System.Drawing.Size(79, 17);
-            this.chkReset.TabIndex = 1;
-            this.chkReset.Text = "Auto Reset";
-            this.chkReset.UseVisualStyleBackColor = true;
+            this.chkNGPstart.AutoSize = true;
+            this.chkNGPstart.Checked = true;
+            this.chkNGPstart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.chkNGPstart.Location = new System.Drawing.Point(150, 23);
+            this.chkNGPstart.Name = "chkNGPstart";
+            this.chkNGPstart.Size = new System.Drawing.Size(141, 17);
+            this.chkNGPstart.TabIndex = 1;
+            this.chkNGPstart.Text = "Auto Start (New Game+)";
+            this.toolTip1.SetToolTip(this.chkNGPstart, "Will automatically LiveSplit\'s timer upon\r\nselection of Emerald Hill Zone on a\r\nc" +
+        "ompleted savefile.");
+            this.chkNGPstart.UseVisualStyleBackColor = true;
+            // 
+            // btnSetSplits
+            // 
+            this.btnSetSplits.Location = new System.Drawing.Point(390, 456);
+            this.btnSetSplits.Margin = new System.Windows.Forms.Padding(0);
+            this.btnSetSplits.Name = "btnSetSplits";
+            this.btnSetSplits.Size = new System.Drawing.Size(75, 23);
+            this.btnSetSplits.TabIndex = 20;
+            this.btnSetSplits.Text = "Set up splits";
+            this.btnSetSplits.UseVisualStyleBackColor = true;
+            this.btnSetSplits.Click += new System.EventHandler(this.btnSetSplits_Click);
             // 
             // Settings
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.Controls.Add(this.btnSetSplits);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Margin = new System.Windows.Forms.Padding(0);
@@ -366,7 +395,6 @@
             this.groupBox2.ResumeLayout(false);
             this.groupBox2.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -396,5 +424,7 @@
         private System.Windows.Forms.CheckBox chkAR1;
         private System.Windows.Forms.CheckBox chkCP2;
         private System.Windows.Forms.CheckBox chkReset;
+        private System.Windows.Forms.CheckBox chkNGPstart;
+        private System.Windows.Forms.Button btnSetSplits;
     }
 }

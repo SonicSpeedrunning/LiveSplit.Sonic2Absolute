@@ -19,6 +19,7 @@ namespace LiveSplit.Sonic2Absolute
         {
             timer = new TimerModel { CurrentState = state };
             Settings = new Settings();
+            Settings.OnbtnSetSplits_Click += OnSetSplits;
 
             SplittingLogic = new SplittingLogic();
             SplittingLogic.OnStartTrigger += OnStartTrigger;
@@ -26,19 +27,17 @@ namespace LiveSplit.Sonic2Absolute
             SplittingLogic.OnResetTrigger += OnResetTrigger;
 
             update_timer = new System.Timers.Timer() { Interval = 15, Enabled = true, AutoReset = false };
-            update_timer.Elapsed += UpdateTimer_Tick;
+            update_timer.Elapsed += delegate { SplittingLogic.Update(); update_timer.Start(); };
         }
 
-        void UpdateTimer_Tick(object sender, EventArgs e)
-        {
-            SplittingLogic.Update();
-            update_timer.Start();
-        }
-
-        void OnStartTrigger(object sender, EventArgs e)
+        void OnStartTrigger(object sender, StartTrigger type)
         {
             if (timer.CurrentState.CurrentPhase != TimerPhase.NotRunning) return;
-            if (Settings.RunStart) timer.Start();
+            switch (type)
+            {
+                case StartTrigger.NewGame: if (Settings.RunStart) timer.Start(); break;
+                case StartTrigger.NewGamePlus: if (Settings.RunStartNGP) timer.Start(); break;
+            }
         }
 
         void OnSplitTrigger(object sender, Acts type)
@@ -78,6 +77,36 @@ namespace LiveSplit.Sonic2Absolute
         {
             Settings.Dispose();
             update_timer?.Dispose();
+        }
+
+        public void OnSetSplits(object sender, EventArgs e)
+        {
+            var question = MessageBox.Show("This will set up your splits according to your selected autosplitting options.\n" +
+                                            "WARNING: Any existing PB recorded for the current layout will be deleted.\n\n" +
+                                            "Do you want to continue?", "Livesplit - Sonic 2 Absolute", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            if (question == DialogResult.No) return;
+            timer.CurrentState.Run.Clear();
+            if (Settings.EH1) timer.CurrentState.Run.AddSegment("Emerald Hill - Act 1");
+            if (Settings.EH2) timer.CurrentState.Run.AddSegment("Emerald Hill - Act 1");
+            if (Settings.CP1) timer.CurrentState.Run.AddSegment("Chemical Plant - Act 1");
+            if (Settings.CP2) timer.CurrentState.Run.AddSegment("Chemical Plant - Act 2");
+            if (Settings.AR1) timer.CurrentState.Run.AddSegment("Aquatic Ruin - Act 1");
+            if (Settings.AR2) timer.CurrentState.Run.AddSegment("Aquatic Ruin - Act 2");
+            if (Settings.CN1) timer.CurrentState.Run.AddSegment("Casino Night- Act 1");
+            if (Settings.CN2) timer.CurrentState.Run.AddSegment("Casino Night- Act 2");
+            if (Settings.HT1) timer.CurrentState.Run.AddSegment("Hill Top - Act 1");
+            if (Settings.HT2) timer.CurrentState.Run.AddSegment("Hill Top - Act 2");
+            if (Settings.MC1) timer.CurrentState.Run.AddSegment("Mystic Cave - Act 1");
+            if (Settings.MC2) timer.CurrentState.Run.AddSegment("Mystic Cave - Act 2");
+            if (Settings.OO1) timer.CurrentState.Run.AddSegment("Oil Ocean - Act 1");
+            if (Settings.OO2) timer.CurrentState.Run.AddSegment("Oil Ocean - Act 2");
+            if (Settings.MZ1) timer.CurrentState.Run.AddSegment("Metropolis - Act 1");
+            if (Settings.MZ2) timer.CurrentState.Run.AddSegment("Metropolis - Act 2");
+            if (Settings.MZ3) timer.CurrentState.Run.AddSegment("Metropolis - Act 3");
+            if (Settings.SCZ) timer.CurrentState.Run.AddSegment("Sky Chase");
+            if (Settings.WFZ) timer.CurrentState.Run.AddSegment("Wing Fortress");
+            if (Settings.DEZ) timer.CurrentState.Run.AddSegment("Death Egg");
+            if (timer.CurrentState.Run.Count == 0) timer.CurrentState.Run.AddSegment("");
         }
 
         public override XmlNode GetSettings(XmlDocument document) { return this.Settings.GetSettings(document); }
