@@ -55,20 +55,20 @@
   <ItemGroup>
     <Compile Include="Game\Enums.cs" />
     <Compile Include="Game\SplittingLogic.cs" />
-    <Compile Include="Sonic2Absolute_Component.cs" />
-    <Compile Include="Sonic2Absolute_Factory.cs" />
-    <Compile Include="Sonic2Absolute_Settings.cs">
+    <Compile Include="Component.cs" />
+    <Compile Include="Properties\Factory.cs" />
+    <Compile Include="Settings\Settings.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="Sonic2Absolute_Settings.Designer.cs">
-      <DependentUpon>Sonic2Absolute_Settings.cs</DependentUpon>
+    <Compile Include="Settings\Settings.Designer.cs">
+      <DependentUpon>Settings.cs</DependentUpon>
     </Compile>
     <Compile Include="Game\GameMemory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Sonic2Absolute_Settings.resx">
-      <DependentUpon>Sonic2Absolute_Settings.cs</DependentUpon>
+    <EmbeddedResource Include="Settings\Settings.resx">
+      <DependentUpon>Settings.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

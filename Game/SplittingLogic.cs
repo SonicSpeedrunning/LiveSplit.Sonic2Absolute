@@ -51,10 +51,4 @@ namespace LiveSplit.Sonic2Absolute
             return boolean.Current && !boolean.Old;
         }
     }
-
-    enum StartTrigger
-    {
-        NewGame,
-        NewGamePlus
-    }
 }
