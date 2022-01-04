@@ -50,7 +50,32 @@ namespace LiveSplit.Sonic2Absolute
                     break;
 
                 default:
-                    throw new Exception("Unsupported game version!");
+                    var scanner = new SignatureScanner(game, game.MainModuleWow64Safe().BaseAddress, game.MainModuleWow64Safe().ModuleMemorySize);
+                    IntPtr ptr;
+
+                    ptr = scanner.Scan(new SigScanTarget(1,
+                        "A3 ????????",      // mov [Sonic2Absolute.exe+141B6CC],eax  <---
+                        "E8 ????????",      // call Sonic2Absolute.exe+B410
+                        "33 D2")            // xor edx,edx
+                    { OnFound = (p, s, addr) => (IntPtr)p.ReadValue<int>(addr) });
+                    if (ptr == IntPtr.Zero) throw new Exception();
+                    this.LevelID = new MemoryWatcher<byte>(new DeepPointer(ptr));
+
+                    ptr = scanner.Scan(new SigScanTarget(7,
+                        "69 F8 ????????")   // imul edi,eax,000000C1
+                    { OnFound = (p, s, addr) => (IntPtr)p.ReadValue<int>(addr) });
+                    if (ptr == IntPtr.Zero) throw new Exception();
+                    this.ZoneIndicator = new MemoryWatcher<uint>(new DeepPointer(ptr));
+
+                    ptr = scanner.Scan(new SigScanTarget(4,
+                        "89 45 F8",     // mov [ebp-08],eax
+                        "A1 ????????")  // mov eax,[Sonic2Absolute.exe+1310D8C]  <---
+                    { OnFound = (p, s, addr) => (IntPtr)p.ReadValue<int>(addr) + 0x910 });
+                    if (ptr == IntPtr.Zero) throw new Exception();
+                    this.State = new MemoryWatcher<byte>(new DeepPointer(ptr));
+                    this.StartIndicator = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x80));
+                    this.ZoneSelectOnGameComplete = new MemoryWatcher<byte>(new DeepPointer(ptr + 0x8));
+                    break;
             }
 
             this.AddRange(this.GetType().GetProperties(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance).Where(p => !p.GetIndexParameters().Any()).Select(p => p.GetValue(this, null) as MemoryWatcher).Where(p => p != null));

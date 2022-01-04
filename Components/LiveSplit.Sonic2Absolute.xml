@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <updates>
+	<update version="1.0.3.0">
+		<files>
+			<file path="Components/LiveSplit.Sonic2Absolute.dll" status="changed" />
+		</files>
+		<changelog>
+			<change>Re-implemented sigscanning. Should provide support for future versions of the game.</change>
+		</changelog>
+	</update>
 	<update version="1.0.2.0">
 		<files>
 			<file path="Components/LiveSplit.Sonic2Absolute.dll" status="changed" />
