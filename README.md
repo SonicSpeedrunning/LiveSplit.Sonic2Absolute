@@ -1,5 +1,5 @@
-<h1> <img src="https://raw.githubusercontent.com/SonicSpeedrunning/LiveSplit.Sonic2Absolute/master/Sonic_2_Absolute_Icon.webp" alt="SonicForever" height="75" align="middle" /> Sonic the Hedgehog Forever - Autosplitter</h1>
+<h1> <img src="https://raw.githubusercontent.com/SonicSpeedrunning/LiveSplit.Sonic2Absolute/master/Sonic_2_Absolute_Icon.webp" alt="Sonic2Absolute" height="75" align="middle" /> Sonic 2 Absolute - Autosplitter</h1>
 
-Autosplitter for Sonic 1 Forever with customizable options
+Autosplitter for Sonic 2 Absolute with customizable options
 
 <img src="https://raw.githubusercontent.com/SonicSpeedrunning/LiveSplit.Sonic2Absolute/master/settings.png">
