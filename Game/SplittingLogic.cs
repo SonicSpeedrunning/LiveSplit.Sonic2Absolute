@@ -1,54 +1,45 @@
 ﻿using System;
-using System.Threading;
 
 namespace LiveSplit.Sonic2Absolute
 {
-    class SplittingLogic
+    partial class Sonic2AbsoluteComponent
     {
-        private Watchers watchers;
-
-        public event EventHandler<StartTrigger> OnStartTrigger;
-        public event EventHandler<Acts> OnSplitTrigger;
-        public event EventHandler OnResetTrigger;
-
-        public void Update()
+        private bool Start()
         {
-            if (!VerifyOrHookGameProcess()) return;
-            watchers.Update();
-            Start();
-            ResetLogic();
-            Split();
+            bool RunStartedSaveFile, RunStartedNoSaveFile, RunStartedNGP;
+
+            RunStartedSaveFile = watchers.State.Old == 5 && watchers.State.Current == 7;
+            RunStartedNoSaveFile = watchers.State.Current == 4 && watchers.StartIndicator.Changed && watchers.StartIndicator.Current == 1;
+            RunStartedNGP = watchers.State.Current == 6 && watchers.StartIndicator.Changed && watchers.StartIndicator.Current == 1 && watchers.ZoneSelectOnGameComplete.Current == 0;
+
+            return (settings.StartCleanSave && (RunStartedSaveFile || RunStartedNoSaveFile)) || (settings.StartNewGamePlus && RunStartedNGP);
         }
 
-        void Start()
+        private bool Split()
         {
-            if (FlippedBool(watchers.RunStartedSaveFile) || FlippedBool(watchers.RunStartedNoSaveFile))
-                this.OnStartTrigger?.Invoke(this, StartTrigger.NewGame);
-            else if (FlippedBool(watchers.RunStartedNGP))
-                this.OnStartTrigger?.Invoke(this, StartTrigger.NewGamePlus);
+            if (watchers.Act.Current == watchers.Act.Old + 1)
+                return settings["c" + ((int)watchers.Act.Old + 1).ToString()];
+            else if (watchers.Act.Current == (Acts)(-1) && watchers.Act.Current != watchers.Act.Old)
+                return settings.c20;
+            else return false;
         }
 
-        void ResetLogic()
+        bool Reset()
         {
-            if (FlippedBool(watchers.StartingNewGame)) this.OnResetTrigger?.Invoke(this, EventArgs.Empty);
+            if (!settings.Reset)
+                return false;
+
+            return watchers.State.Old == 0 && (watchers.State.Current == 4 || watchers.State.Current == 5);
         }
 
-        void Split()
+        bool IsLoading()
         {
-            if (watchers.Act.Changed && watchers.Act.Current == Acts.Ending) { this.OnSplitTrigger?.Invoke(this, Acts.DeathEgg); }
-            else if (watchers.Act.Old == watchers.Act.Current - 1) { this.OnSplitTrigger?.Invoke(this, watchers.Act.Old); }
+            return false;
         }
 
-        bool VerifyOrHookGameProcess()
+        private TimeSpan? GameTime()
         {
-            if (watchers != null && watchers.IsGameHooked) return true;
-            try { watchers = new Watchers(); } catch { Thread.Sleep(500); return false; }
-            return true;
-        }
-
-        private bool FlippedBool(FakeMemoryWatcher<bool> boolean)
-        {
-            return boolean.Current && !boolean.Old;
+            return null;
         }
     }
 }
